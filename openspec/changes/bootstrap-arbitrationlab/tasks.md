@@ -2,9 +2,9 @@
 
 ## 0. Fundações
 
-- [ ] 0.1 Criar a estrutura `src/arbitrationlab/`, `tests/`, `frontend/`, `docs/learn/`, `datasets/claims/`, `experiments/`; verificar com `git status`
-- [ ] 0.2 Confirmar e fixar versões em `pyproject.toml` (FastAPI, Pydantic v2, SQLAlchemy, httpx, pytest, Ruff, scikit-learn); `Settings`, `.env.example`, `/health`, autenticação demo com papéis; verificar que `ruff check` e `pytest` passam
-- [ ] 0.3 Escrever `docs/learn/00-visao-geral.md` com o diagrama do pipeline; verificar que corresponde aos módulos
+- [x] 0.1 Criar a estrutura `src/arbitrationlab/`, `tests/`, `frontend/`, `docs/learn/`, `datasets/claims/`, `experiments/`; verificar com `git status`
+- [x] 0.2 Confirmar e fixar versões em `pyproject.toml` (FastAPI, Pydantic v2, SQLAlchemy, httpx, pytest, Ruff, scikit-learn); `Settings`, `.env.example`, `/health`, autenticação demo com papéis; verificar que `ruff check` e `pytest` passam
+- [x] 0.3 Escrever `docs/learn/00-visao-geral.md` com o diagrama do pipeline; verificar que corresponde aos módulos
 
 
 ## 1. Dataset e geração
