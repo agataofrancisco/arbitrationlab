@@ -14,11 +14,11 @@
 
 ## 2. Arbitragem
 
-- [ ] 2.1 Implementar a normalização por tipo (datas com ambiguidade, montantes, matrículas, booleanos); verificar com testes de "3/2/2026" ambíguo e montantes por extenso
-- [ ] 2.2 Implementar a localização de evidência com offsets no texto original; verificar com testes de valor inventado → `evidence: none` e offsets exactos
-- [ ] 2.3 Implementar a fiabilidade histórica (Beta), o score de confiança e a calibração (ECE, reliability diagram); verificar com testes sobre dados com calibração conhecida
-- [ ] 2.4 Implementar a decisão por campo, a verificação barata, o juiz consultivo e a flag `suspected_injection`; verificar com testes de `evidence_conflict`, desacordo com orçamento e injecção
-- [ ] 2.5 Escrever `docs/learn/01` a `05`; verificar que os exemplos vêm dos testes
+- [x] 2.1 Implementar a normalização por tipo (datas com ambiguidade, montantes, matrículas, booleanos); verificar com testes de "3/2/2026" ambíguo e montantes por extenso
+- [x] 2.2 Implementar a localização de evidência com offsets no texto original; verificar com testes de valor inventado → `evidence: none` e offsets exactos
+- [x] 2.3 Implementar a fiabilidade histórica (Beta), o score de confiança e a calibração (ECE, reliability diagram); verificar com testes sobre dados com calibração conhecida
+- [x] 2.4 Implementar a decisão por campo, a verificação barata, o juiz consultivo e a flag `suspected_injection`; verificar com testes de `evidence_conflict`, desacordo com orçamento e injecção
+- [x] 2.5 Escrever `docs/learn/01` a `05`; verificar que os exemplos vêm dos testes
 
 ## 3. API e revisão
 

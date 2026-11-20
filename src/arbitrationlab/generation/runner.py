@@ -84,15 +84,22 @@ async def generate_candidates(
     schema: dict[str, Any],
     providers: Sequence[CandidateProvider],
     *,
-    max_spend: float,
     timeout_s: float,
+    max_spend: float | None = None,
+    ledger: BudgetLedger | None = None,
 ) -> list[CandidateRecord]:
-    """Corre os fornecedores em paralelo e devolve um registo por fornecedor, pela mesma ordem."""
+    """Corre os fornecedores em paralelo e devolve um registo por fornecedor, pela mesma ordem.
+
+    Passa-se `max_spend` (orcamento novo) ou um `ledger` partilhado com as verificacoes.
+    """
     if not isinstance(text, str):
         raise ValueError("o texto tem de ser uma string")
     if isinstance(timeout_s, bool) or not isinstance(timeout_s, int | float) or timeout_s <= 0:
         raise ValueError("timeout_s tem de ser um numero positivo")
-    ledger = BudgetLedger(max_spend)
+    if ledger is None:
+        if max_spend is None:
+            raise ValueError("indique max_spend ou um ledger")
+        ledger = BudgetLedger(max_spend)
     records: list[CandidateRecord | None] = [None] * len(providers)
     pending: list[tuple[int, asyncio.Task[CandidateRecord]]] = []
     for index, provider in enumerate(providers):
