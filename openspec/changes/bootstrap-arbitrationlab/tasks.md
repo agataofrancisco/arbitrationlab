@@ -9,8 +9,8 @@
 
 ## 1. Dataset e geração
 
-- [ ] 1.1 Criar o gerador de ≥100 participações sintéticas rotuladas com as dificuldades da spec e o manifesto; verificar com o validador de schema do dataset e as estatísticas por dificuldade
-- [ ] 1.2 Implementar os candidatos (adaptador compatível com OpenAI e mock com perfis de erro, incluindo correlacionado) com geração paralela, timeout e orçamento; verificar com testes de timeout, `skipped: budget` e erro correlacionado
+- [x] 1.1 Criar o gerador de ≥100 participações sintéticas rotuladas com as dificuldades da spec e o manifesto; verificar com o validador de schema do dataset e as estatísticas por dificuldade
+- [x] 1.2 Implementar os candidatos (adaptador compatível com OpenAI e mock com perfis de erro, incluindo correlacionado) com geração paralela, timeout e orçamento; verificar com testes de timeout, `skipped: budget` e erro correlacionado
 
 ## 2. Arbitragem
 

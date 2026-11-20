@@ -1,0 +1,22 @@
+{
+  "name": "claims-synthetic",
+  "seed": "arbitrationlab-claims-v1",
+  "generator": "arbitrationlab.dataset.generator",
+  "n_cases": 120,
+  "sha256": "75a13d9841a528e2940fe1d2a653d923ed29921d731a297856af6ac37c2741db",
+  "difficulties": {
+    "clean": 15,
+    "ambiguous_date": 15,
+    "date_words": 15,
+    "amount_words": 15,
+    "inconsistent_amount": 15,
+    "missing_field": 15,
+    "injection": 15,
+    "plate_variant": 15
+  },
+  "splits": {
+    "calibration": 48,
+    "evaluation": 72
+  },
+  "synthetic": true
+}

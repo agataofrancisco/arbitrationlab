@@ -42,3 +42,5 @@ ignore = ["S101"]
 
 [tool.ruff.lint.per-file-ignores]
 "tests/**" = ["S"]
+# Dados sinteticos reprodutiveis: o gerador usa random de proposito, nao criptografia.
+"src/arbitrationlab/dataset/generator.py" = ["S311"]
