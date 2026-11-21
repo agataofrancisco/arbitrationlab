@@ -47,9 +47,12 @@ Cada decisão indica o contexto, a escolha, a alternativa rejeitada e onde está
 ## D11 — Campos revistos como `unreadable` não são etiquetas (**nova**)
 - **Escolha**: `export.py` exporta só `confirm` e `correct`. Um campo ilegível não tem valor verdadeiro conhecido.
 
-## D12 — Identidade do revisor declarada, não autenticada (**nova**)
-- **Escolha**: cabeçalho `X-Actor` obrigatório na revisão; regista-se tal como declarado. Tokens são por papel, não por pessoa.
-- **Risco aceite**: ver `docs/architecture.md`, achado 2.
+## D12 — Identidade do revisor derivada do token (principal fixo) (**nova**)
+- **Escolha**: cada token mapeia para um principal fixo (`id` + `role`) em `api/auth.py`: `cliente-demo` (client) e `revisor-demo` (reviewer), configuráveis por `ARBITRATIONLAB_CLIENT_ID` e `ARBITRATIONLAB_REVIEWER_ID`. O id gravado na auditoria e como `created_by` vem sempre do token. O cabeçalho `X-Actor` não é lido: enviá-lo não tem efeito.
+- **Porquê**: a identidade declarada pelo cliente permitia atribuir uma revisão a outra pessoa. Com o principal derivado do token, um revisor não consegue escrever na auditoria em nome de outro.
+- **Limite honesto**: um principal por token. Quem tem o token de revisor é o mesmo principal. Identidade por pessoa exige tokens individuais ou SSO (fora do âmbito demo).
+- **Testes**: `tests/test_api.py::test_identidade_do_revisor_vem_do_token_e_x_actor_nao_tem_efeito`, `test_principal_do_token_e_configuravel_e_nao_forjavel`, `test_cliente_nao_pode_escrever_na_auditoria`.
+- **Achado resolvido**: ver `docs/architecture.md`, achado 2.
 
 ## D13 — Tokens de demo no código, com override por ambiente (**nova**)
 - **Escolha**: `config.py` tem tokens de demo por defeito, documentados como não-segredos. O risco de arranque sem override está registado como achado 1.

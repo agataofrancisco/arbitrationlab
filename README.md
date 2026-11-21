@@ -64,7 +64,7 @@ curl -X POST http://127.0.0.1:8000/arbitrations \
 curl http://127.0.0.1:8000/arbitrations/<id> -H "Authorization: Bearer demo-client-token"
 ```
 
-Endpoints: `POST /arbitrations`, `GET /arbitrations/{id}`, `GET /arbitrations/{id}/candidates`, `POST /arbitrations/{id}/human-review` (papel `reviewer`, cabeçalho `X-Actor`), `GET /reviews/export` (papel `reviewer`), `GET /metrics`, `GET /schemas/claim`, `GET /health`.
+Endpoints: `POST /arbitrations`, `GET /arbitrations/{id}`, `GET /arbitrations/{id}/candidates`, `POST /arbitrations/{id}/human-review` (papel `reviewer`; o revisor é o principal do token), `GET /reviews/export` (papel `reviewer`), `GET /metrics`, `GET /schemas/claim`, `GET /health`.
 
 ## Painel de revisão
 
@@ -89,6 +89,6 @@ O token e o identificador do revisor ficam só em memória no separador.
 
 - Os modelos são mocks deterministas com erros injectados; não medem LLMs reais.
 - A revisão humana é simulada a partir dos labels (optimista).
-- A identidade do revisor é declarada pelo cliente (`X-Actor`), não autenticada.
+- A identidade do revisor é a do token (principal fixo `revisor-demo`, configurável). Não há identidade por pessoa: quem tiver o token de revisor actua como esse principal.
 - Docker e `docker-compose.yml` não foram testados localmente.
 - O adaptador RegressionGuard (tarefa 4.3, opcional) não foi feito.

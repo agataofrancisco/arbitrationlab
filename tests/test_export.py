@@ -6,7 +6,7 @@ from pathlib import Path
 from fastapi.testclient import TestClient
 
 from arbitrationlab.api.app import create_app
-from arbitrationlab.config import DEMO_CLIENT_TOKEN, DEMO_REVIEWER_TOKEN, Settings
+from arbitrationlab.config import DEMO_CLIENT_TOKEN, Settings
 from arbitrationlab.dataset.validate import load_jsonl
 from arbitrationlab.export import export_reviews_jsonl
 from arbitrationlab.schema import claim_output_schema
@@ -15,7 +15,6 @@ from arbitrationlab.store.repository import ArbitrationStore, Decision
 ROOT = Path(__file__).resolve().parents[1]
 CASES = load_jsonl(ROOT / "datasets" / "claims" / "claims.jsonl")
 CLIENT = {"Authorization": f"Bearer {DEMO_CLIENT_TOKEN}"}
-REVIEWER = {"Authorization": f"Bearer {DEMO_REVIEWER_TOKEN}", "X-Actor": "revisor.joao"}
 
 
 def _store_with_reviews(tmp_path: Path) -> ArbitrationStore:

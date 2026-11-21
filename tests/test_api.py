@@ -15,7 +15,7 @@ from arbitrationlab.schema import claim_output_schema
 ROOT = Path(__file__).resolve().parents[1]
 CASES = load_jsonl(ROOT / "datasets" / "claims" / "claims.jsonl")
 CLIENT = {"Authorization": f"Bearer {DEMO_CLIENT_TOKEN}"}
-REVIEWER = {"Authorization": f"Bearer {DEMO_REVIEWER_TOKEN}", "X-Actor": "revisora.ana"}
+REVIEWER = {"Authorization": f"Bearer {DEMO_REVIEWER_TOKEN}"}
 
 
 @pytest.fixture
@@ -138,7 +138,8 @@ def test_falha_do_motor_fica_registada_sem_derrubar_a_api(
     arbitration_id = _create(client, CASES[0]["text"])
     body = client.get(f"/arbitrations/{arbitration_id}", headers=CLIENT).json()
     assert body["status"] == "failed"
-    assert "motor avariado" in body["error"]
+    assert "motor avariado" not in body["error"]
+    assert body["error"].startswith("erro interno do servidor (ref ")
 
 
 def _ambiguous_case() -> dict[str, Any]:
@@ -150,19 +151,92 @@ def test_revisao_com_papel_client_e_403(client: TestClient) -> None:
     response = client.post(
         f"/arbitrations/{arbitration_id}/human-review",
         json={"decisions": [{"field": "incident_date", "action": "confirm"}]},
-        headers={**CLIENT, "X-Actor": "alguem"},
+        headers=CLIENT,
     )
     assert response.status_code == 403
 
 
-def test_revisao_sem_identificacao_do_revisor_e_422(client: TestClient) -> None:
+def _audit_actors(client: TestClient) -> list[str]:
+    lines = client.get("/reviews/export", headers=REVIEWER).text.splitlines()
+    return [json.loads(line)["reviewed_by"] for line in lines]
+
+
+def test_identidade_do_revisor_vem_do_token_e_x_actor_nao_tem_efeito(client: TestClient) -> None:
     arbitration_id = _create(client, _ambiguous_case()["text"])
     response = client.post(
         f"/arbitrations/{arbitration_id}/human-review",
-        json={"decisions": [{"field": "incident_date", "action": "confirm"}]},
-        headers={"Authorization": f"Bearer {DEMO_REVIEWER_TOKEN}"},
+        json={
+            "decisions": [{"field": "incident_date", "action": "correct", "value": "2026-03-09"}]
+        },
+        headers={**REVIEWER, "X-Actor": "outra.pessoa"},
     )
-    assert response.status_code == 422
+    assert response.status_code == 200, response.text
+    assert _audit_actors(client) == ["revisor-demo"]
+
+
+def test_revisao_sem_cabecalho_de_identidade_funciona(client: TestClient) -> None:
+    arbitration_id = _create(client, _ambiguous_case()["text"])
+    response = client.post(
+        f"/arbitrations/{arbitration_id}/human-review",
+        json={
+            "decisions": [{"field": "incident_date", "action": "correct", "value": "2026-03-09"}]
+        },
+        headers=REVIEWER,
+    )
+    assert response.status_code == 200
+    assert _audit_actors(client) == ["revisor-demo"]
+
+
+def test_principal_do_token_e_configuravel_e_nao_forjavel(tmp_path: Path) -> None:
+    settings = Settings(
+        database_url=f"sqlite:///{(tmp_path / 'principal.db').as_posix()}",
+        reviewer_id="ana.silva",
+    )
+    client = TestClient(create_app(settings))
+    arbitration_id = _create(client, _ambiguous_case()["text"])
+    client.post(
+        f"/arbitrations/{arbitration_id}/human-review",
+        json={
+            "decisions": [{"field": "incident_date", "action": "correct", "value": "2026-03-09"}]
+        },
+        headers={**REVIEWER, "X-Actor": "mais.alguem"},
+    )
+    assert _audit_actors(client) == ["ana.silva"]
+
+
+def test_cliente_nao_pode_escrever_na_auditoria(client: TestClient) -> None:
+    arbitration_id = _create(client, _ambiguous_case()["text"])
+    response = client.post(
+        f"/arbitrations/{arbitration_id}/human-review",
+        json={"decisions": [{"field": "incident_date", "action": "unreadable"}]},
+        headers={**CLIENT, "X-Actor": "revisor-demo"},
+    )
+    assert response.status_code == 403
+    assert _audit_actors(client) == []
+
+
+def test_erro_interno_numa_rota_devolve_mensagem_generica_e_request_id(
+    client: TestClient, monkeypatch: pytest.MonkeyPatch, caplog: pytest.LogCaptureFixture
+) -> None:
+    def boom(*args: Any, **kwargs: Any) -> None:
+        raise RuntimeError("detalhe-interno-segredo")
+
+    arbitration_id = _create(client, _ambiguous_case()["text"])
+    monkeypatch.setattr(client.app.state.store, "review", boom)
+    local = TestClient(client.app, raise_server_exceptions=False)
+    with caplog.at_level("ERROR", logger="arbitrationlab.api"):
+        response = local.post(
+            f"/arbitrations/{arbitration_id}/human-review",
+            json={"decisions": [{"field": "incident_date", "action": "unreadable"}]},
+            headers=REVIEWER,
+        )
+    assert response.status_code == 500
+    body = response.json()
+    assert body["detail"] == "erro interno do servidor"
+    assert body["request_id"] == response.headers["X-Request-ID"]
+    assert "detalhe-interno-segredo" not in response.text
+    assert "detalhe-interno-segredo" in caplog.text
+    assert body["request_id"] in caplog.text
 
 
 def test_correccao_humana_fica_auditada_e_uma_segunda_revisao_e_409(client: TestClient) -> None:

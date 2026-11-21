@@ -1,4 +1,5 @@
-// Cliente HTTP minimo. O token e o actor vivem so em memoria (nunca em localStorage).
+// Cliente HTTP minimo. O token vive so em memoria (nunca em localStorage). A identidade do
+// revisor e derivada do token no servidor; o cliente nao envia cabecalhos de identidade.
 
 export class ApiError extends Error {
   constructor(status, message) {
@@ -15,10 +16,9 @@ function describeDetail(detail) {
   return "erro desconhecido";
 }
 
-export async function apiRequest(path, { token, actor, method = "GET", body } = {}) {
+export async function apiRequest(path, { token, method = "GET", body } = {}) {
   const headers = {};
   if (token) headers.Authorization = `Bearer ${token}`;
-  if (actor) headers["X-Actor"] = actor;
   if (body !== undefined) headers["Content-Type"] = "application/json";
   let response;
   try {

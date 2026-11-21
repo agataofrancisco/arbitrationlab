@@ -111,7 +111,7 @@ A validação é feita na fronteira (pydantic com `extra="forbid"`, limites de t
 Cada alteração grava actor, valor anterior, novo valor, texto e data numa tabela própria. Não há actualização sem registo porque ambas as escritas estão na mesma transacção.
 
 **33. O que fica por resolver na autenticação?**
-O `X-Actor` é declarado e não autenticado; os tokens de demo estão no código com override por ambiente. Achados 1 e 2 em `docs/architecture.md`.
+A identidade do revisor vem do token (principal fixo; `X-Actor` é ignorado). Limite: um principal por token, sem identidade por pessoa. Os tokens de demo estão no código com override por ambiente. Achado 1 aberto e achado 2 resolvido em `docs/architecture.md`.
 
 **34. Porque é que a revisão só aceita campos `human_review` ou `abstain`?**
 Porque campos aceites não precisam de revisão e alterá-los sem razão corrompe o registo de decisões automáticas. Um segundo pedido de revisão para o mesmo campo devolve 409.

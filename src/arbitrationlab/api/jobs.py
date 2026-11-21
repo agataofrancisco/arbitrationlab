@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import logging
+import uuid
 from typing import Any
 
 from arbitrationlab.decision import Policy
@@ -51,8 +52,9 @@ def run_arbitration_job(
             verifier=models[VERIFIER],
             judge=models[JUDGE],
         )
-    except Exception as exc:  # noqa: BLE001 - o erro fica no registo da arbitragem
-        log.exception("arbitragem %s falhou", arbitration_id)
-        store.save_failure(arbitration_id, f"{type(exc).__name__}: {exc}")
+    except Exception:  # noqa: BLE001 - falha registada com referencia; detalhe so no log
+        error_ref = uuid.uuid4().hex[:12]
+        log.exception("arbitragem %s falhou (ref %s)", arbitration_id, error_ref)
+        store.save_failure(arbitration_id, f"erro interno do servidor (ref {error_ref})")
         return
     store.save_outcome(arbitration_id, outcome)

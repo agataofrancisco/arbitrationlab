@@ -4,8 +4,24 @@ import pytest
 from fastapi.testclient import TestClient
 
 from arbitrationlab.api.app import create_app
-from arbitrationlab.api.auth import resolve_role
-from arbitrationlab.config import DEMO_CLIENT_TOKEN, DEMO_REVIEWER_TOKEN, Settings
+from arbitrationlab.api.auth import Principal, resolve_principal
+from arbitrationlab.config import (
+    DEMO_CLIENT_ID,
+    DEMO_CLIENT_TOKEN,
+    DEMO_REVIEWER_ID,
+    DEMO_REVIEWER_TOKEN,
+    Settings,
+)
+
+
+def _resolve(header: str | None) -> Principal | None:
+    return resolve_principal(
+        header,
+        client_token=DEMO_CLIENT_TOKEN,
+        client_id=DEMO_CLIENT_ID,
+        reviewer_token=DEMO_REVIEWER_TOKEN,
+        reviewer_id=DEMO_REVIEWER_ID,
+    )
 
 
 def test_health_responde_sem_autenticacao() -> None:
@@ -13,22 +29,6 @@ def test_health_responde_sem_autenticacao() -> None:
     response = client.get("/health")
     assert response.status_code == 200
     assert response.json()["status"] == "ok"
-
-
-def test_resolve_role_distingue_papeis() -> None:
-    assert (
-        resolve_role(f"Bearer {DEMO_REVIEWER_TOKEN}", DEMO_CLIENT_TOKEN, DEMO_REVIEWER_TOKEN)
-        == "reviewer"
-    )
-    assert (
-        resolve_role(f"bearer {DEMO_CLIENT_TOKEN}", DEMO_CLIENT_TOKEN, DEMO_REVIEWER_TOKEN)
-        == "client"
-    )
-
-
-@pytest.mark.parametrize("header", [None, "", "Basic abc", "Bearer ", "Bearer errado"])
-def test_resolve_role_rejeita_cabecalhos_invalidos(header: str | None) -> None:
-    assert resolve_role(header, DEMO_CLIENT_TOKEN, DEMO_REVIEWER_TOKEN) is None
 
 
 def test_settings_from_env_usa_defaults_e_valida_numeros() -> None:
@@ -39,3 +39,13 @@ def test_settings_from_env_usa_defaults_e_valida_numeros() -> None:
         Settings.from_env({"ARBITRATIONLAB_MAX_SPEND_DEFAULT": "muito"})
     with pytest.raises(ValueError, match="negativo"):
         Settings.from_env({"ARBITRATIONLAB_CANDIDATE_TIMEOUT_S": "-1"})
+
+
+@pytest.mark.parametrize("header", [None, "", "Basic abc", "Bearer ", "Bearer errado"])
+def test_resolve_principal_rejeita_cabecalhos_invalidos(header: str | None) -> None:
+    assert _resolve(header) is None
+
+
+def test_resolve_principal_mapeia_cada_token_para_principal_fixo() -> None:
+    assert _resolve(f"Bearer {DEMO_REVIEWER_TOKEN}") == Principal(DEMO_REVIEWER_ID, "reviewer")
+    assert _resolve(f"bearer {DEMO_CLIENT_TOKEN}") == Principal(DEMO_CLIENT_ID, "client")

@@ -32,7 +32,7 @@ class ArbitrationRow(Base):
     latency_ms: Mapped[float] = mapped_column(Float, default=0.0)
     judge: Mapped[dict[str, Any] | None] = mapped_column(JSON, nullable=True)
     error: Mapped[str | None] = mapped_column(Text, nullable=True)
-    created_by: Mapped[str] = mapped_column(String(20))
+    created_by: Mapped[str] = mapped_column(String(64))
     created_at: Mapped[datetime] = mapped_column(DateTime, default=_utcnow)
     candidates: Mapped[list[CandidateRow]] = relationship(
         cascade="all, delete-orphan", order_by="CandidateRow.position", lazy="selectin"

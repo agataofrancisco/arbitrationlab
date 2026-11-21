@@ -4,10 +4,10 @@ from __future__ import annotations
 
 from typing import Annotated, Any
 
-from fastapi import APIRouter, BackgroundTasks, Depends, Header, HTTPException, Path, Request
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Path, Request
 from fastapi.responses import PlainTextResponse
 
-from arbitrationlab.api.auth import require_roles
+from arbitrationlab.api.auth import Principal, require_principal
 from arbitrationlab.api.jobs import CANDIDATE_POOL, run_arbitration_job
 from arbitrationlab.api.schemas import ArbitrationIn, HumanReviewIn
 from arbitrationlab.api.views import arbitration_view, candidate_view
@@ -18,8 +18,8 @@ from arbitrationlab.store.repository import ArbitrationStore, Decision, ReviewEr
 
 router = APIRouter()
 ArbitrationId = Annotated[str, Path(pattern=r"^[0-9a-f]{32}$")]
-ANY_ROLE = Depends(require_roles("client", "reviewer"))
-REVIEWER = Depends(require_roles("reviewer"))
+ANY_ROLE = Depends(require_principal("client", "reviewer"))
+REVIEWER = Depends(require_principal("reviewer"))
 
 
 def _store(request: Request) -> ArbitrationStore:
@@ -34,7 +34,7 @@ def _load(store: ArbitrationStore, arbitration_id: str) -> Any:
 
 
 @router.get("/schemas/claim")
-def get_claim_schema(role: Annotated[str, ANY_ROLE]) -> dict[str, Any]:
+def get_claim_schema(principal: Annotated[Principal, ANY_ROLE]) -> dict[str, Any]:
     return claim_output_schema()
 
 
@@ -43,7 +43,7 @@ def create_arbitration(
     body: ArbitrationIn,
     request: Request,
     background: BackgroundTasks,
-    role: Annotated[str, ANY_ROLE],
+    principal: Annotated[Principal, ANY_ROLE],
 ) -> dict[str, Any]:
     try:
         validate_output_schema(body.output_schema)
@@ -74,7 +74,7 @@ def create_arbitration(
         output_schema=body.output_schema,
         policy=body.policy.model_dump(),
         max_spend=max_spend,
-        created_by=role,
+        created_by=principal.id,
     )
     background.add_task(
         run_arbitration_job,
@@ -96,7 +96,7 @@ def create_arbitration(
 def get_arbitration(
     arbitration_id: ArbitrationId,
     request: Request,
-    role: Annotated[str, ANY_ROLE],
+    principal: Annotated[Principal, ANY_ROLE],
 ) -> dict[str, Any]:
     return arbitration_view(_load(_store(request), arbitration_id))
 
@@ -105,7 +105,7 @@ def get_arbitration(
 def get_candidates(
     arbitration_id: ArbitrationId,
     request: Request,
-    role: Annotated[str, ANY_ROLE],
+    principal: Annotated[Principal, ANY_ROLE],
 ) -> dict[str, Any]:
     row = _load(_store(request), arbitration_id)
     return {"arbitration_id": row.id, "candidates": [candidate_view(c) for c in row.candidates]}
@@ -116,25 +116,26 @@ def submit_review(
     arbitration_id: ArbitrationId,
     body: HumanReviewIn,
     request: Request,
-    role: Annotated[str, REVIEWER],
-    x_actor: Annotated[str, Header(min_length=1, max_length=64, pattern=r"^[A-Za-z0-9._@-]+$")],
+    principal: Annotated[Principal, REVIEWER],
 ) -> dict[str, Any]:
     store = _store(request)
     decisions = [Decision(d.field, d.action, d.value) for d in body.decisions]
     try:
-        store.review(arbitration_id, x_actor, decisions)
+        store.review(arbitration_id, principal.id, decisions)
     except ReviewError as exc:
         raise HTTPException(exc.status, str(exc)) from exc
     return arbitration_view(_load(store, arbitration_id))
 
 
 @router.get("/metrics")
-def get_metrics(request: Request, role: Annotated[str, ANY_ROLE]) -> dict[str, Any]:
+def get_metrics(request: Request, principal: Annotated[Principal, ANY_ROLE]) -> dict[str, Any]:
     return metrics(_store(request))
 
 
 @router.get("/reviews/export", response_class=PlainTextResponse)
-def export_reviews(request: Request, role: Annotated[str, REVIEWER]) -> PlainTextResponse:
+def export_reviews(
+    request: Request, principal: Annotated[Principal, REVIEWER]
+) -> PlainTextResponse:
     return PlainTextResponse(
         export_reviews_jsonl(_store(request)), media_type="application/x-ndjson"
     )

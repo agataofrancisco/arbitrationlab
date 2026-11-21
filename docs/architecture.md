@@ -71,14 +71,14 @@ Revisão feita sobre o código actual, sem auditoria externa. Ver a secção fin
 - Tokens Bearer por papel, comparados com `hmac.compare_digest`.
 - `client` cria e consulta arbitragens; `reviewer` também revê e exporta. Testado: 401 sem token, 403 com papel errado.
 - **Achado 1 (aberto, risco médio)**: os tokens por defeito (`demo-client-token`, `demo-reviewer-token`) estão no código. Se o ambiente não definir as variáveis, a API arranca com tokens conhecidos. Mitigação actual: documentado no README e no `.env.example`. Recomendação: falhar o arranque fora de desenvolvimento quando os tokens não forem definidos. Não corrigido nesta entrega.
-- **Achado 2 (aberto, risco baixo)**: a identidade do revisor é o cabeçalho `X-Actor`, declarado pelo cliente e não autenticado. A auditoria regista o identificador declarado, não uma identidade verificada. Mitigação: documentado. Recomendação: identidade por token individual ou SSO.
+- **Achado 2 (resolvido)**: a identidade do revisor era o cabeçalho `X-Actor`, declarado pelo cliente. Agora a identidade vem do token (principal fixo: `revisor-demo`, configurável). `X-Actor` é ignorado e testado. Limite restante: um principal por token, sem identidade por pessoa (ver D12).
 
 ### Dados e privacidade
 
 - Todos os dados são sintéticos. O texto completo de cada arbitragem fica na base de dados sem cifra. Em produção, avaliar cifra em repouso e retenção.
 - O painel guarda o token só em memória; não usa `localStorage`.
 - A chave do adaptador OpenAI é lida de variável de ambiente, nunca registada, e não é exposta pela API. O adaptador não é usado pela API nesta versão.
-- Mensagens de erro de falhas internas são guardadas no campo `error` da arbitragem e visíveis a qualquer papel autenticado. **Achado 3 (aberto, risco baixo)**: pode revelar detalhes internos. Recomendação: expor apenas o tipo do erro a `client`.
+- Erros internos nunca chegam ao cliente. Falhas da arbitragem ficam `failed` com `erro interno do servidor (ref <id>)`; exceções não tratadas devolvem 500 com `{"detail": "erro interno do servidor", "request_id": ...}` e o cabeçalho `X-Request-ID`. O detalhe (tipo, mensagem e traceback) fica só no log do servidor, associado ao mesmo id. **Achado 3 (resolvido)**. Testes: `tests/test_api.py::test_erro_interno_numa_rota_devolve_mensagem_generica_e_request_id` e `test_falha_do_motor_fica_registada_sem_derrubar_a_api`.
 
 ### Concorrência
 

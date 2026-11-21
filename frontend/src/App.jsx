@@ -10,7 +10,6 @@ const POLL_LIMIT = 50;
 
 export default function App() {
   const [token, setToken] = useState("");
-  const [actor, setActor] = useState("");
   const [text, setText] = useState(SAMPLE_TEXT);
   const [schema, setSchema] = useState(null);
   const [arbitration, setArbitration] = useState(null);
@@ -78,7 +77,6 @@ export default function App() {
       if (action === "correct") payload.value = value;
       const view = await apiRequest(`/arbitrations/${arbitration.arbitration_id}/human-review`, {
         token,
-        actor,
         method: "POST",
         body: { decisions: [payload] },
       });
@@ -87,7 +85,7 @@ export default function App() {
   }
 
   const selectedField = arbitration && selected ? arbitration.fields[selected] : null;
-  const canRun = Boolean(token && actor);
+  const canRun = Boolean(token);
 
   return (
     <div className="app">
@@ -97,10 +95,6 @@ export default function App() {
           <label>
             Token
             <input type="password" value={token} onChange={(e) => setToken(e.target.value)} />
-          </label>
-          <label>
-            Revisor (X-Actor)
-            <input value={actor} onChange={(e) => setActor(e.target.value)} />
           </label>
         </div>
       </header>
