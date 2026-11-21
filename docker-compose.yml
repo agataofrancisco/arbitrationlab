@@ -1,0 +1,15 @@
+# NAO TESTADO LOCALMENTE (sem Docker neste ambiente). Tokens de demo: definir os reais no ambiente.
+services:
+  api:
+    build: .
+    ports:
+      - "127.0.0.1:8000:8000"
+    environment:
+      ARBITRATIONLAB_DATABASE_URL: sqlite:////app/data/arbitrationlab.db
+      ARBITRATIONLAB_CLIENT_TOKEN: ${ARBITRATIONLAB_CLIENT_TOKEN:?defina o token de cliente}
+      ARBITRATIONLAB_REVIEWER_TOKEN: ${ARBITRATIONLAB_REVIEWER_TOKEN:?defina o token de revisor}
+    volumes:
+      - arbitrationlab-data:/app/data
+
+volumes:
+  arbitrationlab-data:
