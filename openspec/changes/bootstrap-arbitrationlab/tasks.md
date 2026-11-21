@@ -22,9 +22,9 @@
 
 ## 3. API e revisão
 
-- [ ] 3.1 Implementar a persistência e `POST /arbitrations`, `GET /arbitrations/{id}`, `GET .../candidates`, `POST .../human-review` e `GET /metrics` com papéis; verificar com testes de API (422, 403, auditoria)
-- [ ] 3.2 Implementar a exportação de revisões para JSONL golden (`source: human_review`); verificar com teste
-- [ ] 3.3 Implementar o painel de três colunas com destaque de spans; verificar no browser
+- [x] 3.1 Implementar a persistência e `POST /arbitrations`, `GET /arbitrations/{id}`, `GET .../candidates`, `POST .../human-review` e `GET /metrics` com papéis; verificar com testes de API (422, 403, auditoria)
+- [x] 3.2 Implementar a exportação de revisões para JSONL golden (`source: human_review`); verificar com teste
+- [x] 3.3 Implementar o painel de três colunas com destaque de spans; verificar no browser
 
 ## 4. Experiência
 
