@@ -1,0 +1,302 @@
+{
+  "meta": {
+    "mode": "mock",
+    "provider": "mock",
+    "generated_at": "2026-11-21T06:30:19+00:00",
+    "commit": "cf21160762742e06d5df884564c8936de38a41e5",
+    "dirty": true,
+    "dataset_cases": 120,
+    "dataset_sha256": "75a13d9841a528e2940fe1d2a653d923ed29921d731a297856af6ac37c2741db",
+    "n_calibration": 48,
+    "n_evaluation": 72,
+    "review_cost_usd": 0.3,
+    "prices": {
+      "cheap-a": 0.002,
+      "strong-c": 0.02,
+      "verifier-v": 0.001
+    },
+    "calibrator": {
+      "fitted": true,
+      "n_train": 326,
+      "intercept": 0.20117623988865171,
+      "weights": [
+        2.1870521038844473,
+        0.8955608180958178,
+        0.6017859082621916
+      ]
+    }
+  },
+  "summaries": {
+    "cheap_single": {
+      "cases": 72,
+      "exact_match": 0.75,
+      "macro_f1": 0.9716386554621849,
+      "field_f1": {
+        "policy_number": 1.0,
+        "incident_date": 0.9264705882352942,
+        "license_plate": 1.0,
+        "claimed_amount": 0.875,
+        "currency": 1.0,
+        "third_party_involved": 1.0,
+        "injuries_reported": 1.0
+      },
+      "coverage": 0.9662698412698413,
+      "critical_error_rate": 0.01984126984126984,
+      "review_rate": 0.0,
+      "mean_model_cost_usd": 0.002,
+      "mean_review_cost_usd": 0.0,
+      "mean_cost_usd": 0.002,
+      "total_cost_usd": 0.14400000000000002,
+      "mean_latency_ms": 6.373533333418083,
+      "exact_match_by_difficulty": {
+        "ambiguous_date": 0.0,
+        "amount_words": 1.0,
+        "clean": 1.0,
+        "date_words": 1.0,
+        "inconsistent_amount": 0.0,
+        "injection": 1.0,
+        "missing_field": 1.0,
+        "plate_variant": 1.0
+      }
+    },
+    "strong_single": {
+      "cases": 72,
+      "exact_match": 0.8333333333333334,
+      "macro_f1": 0.9862117981520967,
+      "field_f1": {
+        "policy_number": 1.0,
+        "incident_date": 0.9333333333333333,
+        "license_plate": 1.0,
+        "claimed_amount": 1.0,
+        "currency": 1.0,
+        "third_party_involved": 1.0,
+        "injuries_reported": 0.9701492537313433
+      },
+      "coverage": 0.9563492063492064,
+      "critical_error_rate": 0.0,
+      "review_rate": 0.0,
+      "mean_model_cost_usd": 0.02,
+      "mean_review_cost_usd": 0.0,
+      "mean_cost_usd": 0.02,
+      "total_cost_usd": 1.44,
+      "mean_latency_ms": 4.419544444974438,
+      "exact_match_by_difficulty": {
+        "ambiguous_date": 0.0,
+        "amount_words": 0.8888888888888888,
+        "clean": 1.0,
+        "date_words": 1.0,
+        "inconsistent_amount": 1.0,
+        "injection": 0.7777777777777778,
+        "missing_field": 1.0,
+        "plate_variant": 1.0
+      }
+    },
+    "majority_vote": {
+      "cases": 72,
+      "exact_match": 0.75,
+      "macro_f1": 0.9716386554621849,
+      "field_f1": {
+        "policy_number": 1.0,
+        "incident_date": 0.9264705882352942,
+        "license_plate": 1.0,
+        "claimed_amount": 0.875,
+        "currency": 1.0,
+        "third_party_involved": 1.0,
+        "injuries_reported": 1.0
+      },
+      "coverage": 0.9662698412698413,
+      "critical_error_rate": 0.01984126984126984,
+      "review_rate": 0.0,
+      "mean_model_cost_usd": 0.024,
+      "mean_review_cost_usd": 0.0,
+      "mean_cost_usd": 0.024,
+      "total_cost_usd": 1.728,
+      "mean_latency_ms": 7.1527805557707325,
+      "exact_match_by_difficulty": {
+        "ambiguous_date": 0.0,
+        "amount_words": 1.0,
+        "clean": 1.0,
+        "date_words": 1.0,
+        "inconsistent_amount": 0.0,
+        "injection": 1.0,
+        "missing_field": 1.0,
+        "plate_variant": 1.0
+      }
+    },
+    "evidence_arbitration": {
+      "cases": 72,
+      "exact_match": 0.75,
+      "macro_f1": 0.9726190476190476,
+      "field_f1": {
+        "policy_number": 1.0,
+        "incident_date": 0.9333333333333333,
+        "license_plate": 1.0,
+        "claimed_amount": 0.875,
+        "currency": 1.0,
+        "third_party_involved": 1.0,
+        "injuries_reported": 1.0
+      },
+      "coverage": 0.9642857142857143,
+      "critical_error_rate": 0.017857142857142856,
+      "review_rate": 0.0,
+      "mean_model_cost_usd": 0.024,
+      "mean_review_cost_usd": 0.0,
+      "mean_cost_usd": 0.024,
+      "total_cost_usd": 1.728,
+      "mean_latency_ms": 26.021711110944224,
+      "exact_match_by_difficulty": {
+        "ambiguous_date": 0.0,
+        "amount_words": 1.0,
+        "clean": 1.0,
+        "date_words": 1.0,
+        "inconsistent_amount": 0.0,
+        "injection": 1.0,
+        "missing_field": 1.0,
+        "plate_variant": 1.0
+      }
+    },
+    "arbitration_review": {
+      "cases": 72,
+      "exact_match": 0.875,
+      "macro_f1": 0.9821428571428571,
+      "field_f1": {
+        "policy_number": 1.0,
+        "incident_date": 1.0,
+        "license_plate": 1.0,
+        "claimed_amount": 0.875,
+        "currency": 1.0,
+        "third_party_involved": 1.0,
+        "injuries_reported": 1.0
+      },
+      "coverage": 0.9821428571428571,
+      "critical_error_rate": 0.017857142857142856,
+      "review_rate": 0.03571428571428571,
+      "mean_model_cost_usd": 0.024,
+      "mean_review_cost_usd": 0.075,
+      "mean_cost_usd": 0.099,
+      "total_cost_usd": 7.127999999999999,
+      "mean_latency_ms": 26.136601388720415,
+      "exact_match_by_difficulty": {
+        "ambiguous_date": 1.0,
+        "amount_words": 1.0,
+        "clean": 1.0,
+        "date_words": 1.0,
+        "inconsistent_amount": 0.0,
+        "injection": 1.0,
+        "missing_field": 1.0,
+        "plate_variant": 1.0
+      }
+    }
+  },
+  "analysis": {
+    "correlated_dates": {
+      "total": 1,
+      "caught": 1,
+      "escaped": 0,
+      "examples": [
+        {
+          "case_id": "CLM-0114",
+          "gold": "2026-03-07",
+          "wrong_value": "2026-07-03",
+          "evidence_decision": "human_review",
+          "evidence_reason_caught": true,
+          "majority_final": "2026-07-03"
+        }
+      ]
+    },
+    "accepted_wrong": [
+      {
+        "case_id": "CLM-0053",
+        "difficulty": "inconsistent_amount",
+        "field": "claimed_amount",
+        "accepted": 4655.47,
+        "gold": 3879.56
+      },
+      {
+        "case_id": "CLM-0061",
+        "difficulty": "inconsistent_amount",
+        "field": "claimed_amount",
+        "accepted": 8641.25,
+        "gold": 7201.04
+      },
+      {
+        "case_id": "CLM-0069",
+        "difficulty": "inconsistent_amount",
+        "field": "claimed_amount",
+        "accepted": 7592.64,
+        "gold": 6327.2
+      },
+      {
+        "case_id": "CLM-0077",
+        "difficulty": "inconsistent_amount",
+        "field": "claimed_amount",
+        "accepted": 1797.62,
+        "gold": 1498.02
+      },
+      {
+        "case_id": "CLM-0085",
+        "difficulty": "inconsistent_amount",
+        "field": "claimed_amount",
+        "accepted": 6610.09,
+        "gold": 5508.41
+      },
+      {
+        "case_id": "CLM-0093",
+        "difficulty": "inconsistent_amount",
+        "field": "claimed_amount",
+        "accepted": 2406.85,
+        "gold": 2005.71
+      },
+      {
+        "case_id": "CLM-0101",
+        "difficulty": "inconsistent_amount",
+        "field": "claimed_amount",
+        "accepted": 6752.23,
+        "gold": 5626.86
+      },
+      {
+        "case_id": "CLM-0109",
+        "difficulty": "inconsistent_amount",
+        "field": "claimed_amount",
+        "accepted": 7485.95,
+        "gold": 6238.29
+      },
+      {
+        "case_id": "CLM-0117",
+        "difficulty": "inconsistent_amount",
+        "field": "claimed_amount",
+        "accepted": 3683.0,
+        "gold": 3069.17
+      }
+    ],
+    "cost_without_gain": {
+      "count": 54,
+      "case_ids": [
+        "CLM-0049",
+        "CLM-0051",
+        "CLM-0052",
+        "CLM-0054",
+        "CLM-0055",
+        "CLM-0056",
+        "CLM-0057",
+        "CLM-0059",
+        "CLM-0060",
+        "CLM-0062"
+      ]
+    },
+    "sensitivity": [
+      {
+        "review_cost_usd": 0.05,
+        "mean_cost_usd": 0.036500000000000005
+      },
+      {
+        "review_cost_usd": 0.3,
+        "mean_cost_usd": 0.099
+      },
+      {
+        "review_cost_usd": 1.0,
+        "mean_cost_usd": 0.274
+      }
+    ]
+  }
+}

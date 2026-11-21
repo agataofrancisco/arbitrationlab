@@ -44,3 +44,5 @@ ignore = ["S101"]
 "tests/**" = ["S"]
 # Dados sinteticos reprodutiveis: o gerador usa random de proposito, nao criptografia.
 "src/arbitrationlab/dataset/generator.py" = ["S311"]
+# Modelos de texto do relatorio (Markdown): linhas longas de template sao aceites.
+"src/arbitrationlab/experiments/report.py" = ["E501"]
