@@ -19,6 +19,10 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+# Opcional: avaliador para o RegressionGuard (versao publicada v0.1.0). Nao e necessario para a API.
+regressionguard = [
+    "regressionguard @ git+https://github.com/agataofrancisco/regressionguard@v0.1.0",
+]
 dev = [
     "pytest==9.2.0",
     "ruff==0.17.6",

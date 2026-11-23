@@ -66,5 +66,9 @@ Cada decisão indica o contexto, a escolha, a alternativa rejeitada e onde está
 ## D16 — Painel sem biblioteca de componentes
 - **Escolha**: React e Vite simples, sem plugin de React (o plugin exige peers adicionais). Build verificado com `npm run build`.
 
-## D17 — Adaptador RegressionGuard não implementado
-- **Escolha**: tarefa 4.3 marcada como não feita. O contrato do RegressionGuard é uma função sobre `EvalContext`; integrar exigiria instalar ou importar o pacote vizinho, o que não foi feito para não editar fora do projecto.
+## D17 — Adaptador RegressionGuard como extra opcional (**nova**)
+- **Escolha**: extra `regressionguard` no `pyproject.toml`, apontando à tag publicada `v0.1.0` (`git+https://github.com/agataofrancisco/regressionguard@v0.1.0`). O adaptador (`src/arbitrationlab/integrations/regressionguard.py`) regista `arbitrationlab.claim_fields` no registo público (`register`, `EvalContext`, `EvalResult`) e corre datasets com `load_dataset` e `evaluate_output`.
+- **Porquê não `run_suite`**: a função `run_suite` só constrói alvos pela fábrica interna (`extraction`, `minirag`). Para expor a arbitragem como alvo teria de editar a biblioteca. Usou-se a API pública de nível mais baixo.
+- **Contrato verificado na instalação**: `evaluate_output(case, output, root, judge)`; `TargetOutput.data` é um dicionário livre; o avaliador lê `data['accepted']` e `data['decisions']`.
+- **Limite**: o avaliador só regista um valor se o gold e a saída forem comparados como valores canónicos; não avalia qualidade textual.
+- **Verificação**: suite de smoke com 8 casos (um por dificuldade): 7 passam e `CLM-0005` (montante inconsistente, crítico) falha com `accepted_wrong:claimed_amount`, o ponto cego documentado. Testes saltados quando o extra não está instalado (verificado com `sys.modules['regressionguard'] = None`).

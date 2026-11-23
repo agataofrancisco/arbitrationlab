@@ -30,7 +30,7 @@
 
 - [x] 4.1 Implementar o runner das 5 estratégias com revisão simulada e as métricas da spec; verificar que corre em mock e gera tabela e gráfico
 - [x] 4.2 Correr a experiência em mock, gravar o relatório com os casos desfavoráveis e os erros correlacionados; verificar que os números vêm da run
-- [ ] 4.3 (Opcional, NAO FEITO: o contrato do RegressionGuard e uma funcao sobre EvalContext; nao foi instalado nem verificado sem editar o repositorio vizinho) Criar o adaptador que expõe a arbitragem como avaliador do RegressionGuard; verificar com uma suite de exemplo, ou registar como não feito
+- [x] 4.3 (Opcional) Criar o adaptador que expõe a arbitragem como avaliador do RegressionGuard; verificado com suite de exemplo (8 casos, `experiments/regressionguard/claims-smoke.jsonl`) e com testes saltados sem o extra (`tests/test_regressionguard_adapter.py`).
 - [x] 4.4 Escrever `docs/learn/06-custo-vs-qualidade.md` e documentar onde o sistema falha; verificar a consistência com o relatório
 
 ## 5. Entrega

@@ -45,7 +45,7 @@ Os custos são simulados. A revisão é simulada a partir dos labels (0.30 USD p
 - Não há intervalos de confiança. Com 72 casos, a incerteza é grande.
 - A latência medida é de mocks em memória, não de APIs.
 - Docker e o compose não foram testados localmente. O workflow de CI foi validado apenas como YAML (não correu no GitHub).
-- O adaptador RegressionGuard (4.3) não foi feito.
+- O adaptador RegressionGuard (4.3) está feito e verificado só numa suite de smoke de 8 casos; não há métricas de regressão sobre uma suite maior.
 
 ## Validação executada
 

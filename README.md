@@ -77,6 +77,18 @@ npm run build         # build de produção em frontend/dist
 
 O token e o identificador do revisor ficam só em memória no separador.
 
+## Avaliador RegressionGuard (opcional)
+
+A arbitragem pode ser usada como avaliador do [RegressionGuard](https://github.com/agataofrancisco/regressionguard) (v0.1.0). É um extra opcional; a API não depende dele.
+
+```bash
+pip install -e ".[regressionguard]"
+python -c "from pathlib import Path; from arbitrationlab.integrations.regressionguard import run_claim_suite; [print(o) for o in run_claim_suite(Path('experiments/regressionguard/claims-smoke.jsonl'), root=Path('.'))]"
+pytest tests/test_regressionguard_adapter.py   # saltado se o extra não estiver instalado
+```
+
+O avaliador `arbitrationlab.claim_fields` passa se a arbitragem nunca aceita um valor diferente do gold. Campos em revisão não contam como erro.
+
 ## Documentação
 
 - `docs/learn/` — percurso pedagógico (00 a 07), com as decisões e os números reais.
@@ -91,4 +103,4 @@ O token e o identificador do revisor ficam só em memória no separador.
 - A revisão humana é simulada a partir dos labels (optimista).
 - A identidade do revisor é a do token (principal fixo `revisor-demo`, configurável). Não há identidade por pessoa: quem tiver o token de revisor actua como esse principal.
 - Docker e `docker-compose.yml` não foram testados localmente.
-- O adaptador RegressionGuard (tarefa 4.3, opcional) não foi feito.
+- O adaptador RegressionGuard é opcional (extra `regressionguard`, versão `v0.1.0`); só a suite de smoke foi corrida.

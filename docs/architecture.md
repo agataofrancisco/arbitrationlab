@@ -33,6 +33,7 @@ flowchart LR
 | `store/` | Modelos e repositório SQLAlchemy; revisão com auditoria | `models.py`, `repository.py` |
 | `api/` | FastAPI, autenticação por papel, contratos pydantic, vistas | `app.py`, `routes.py`, `auth.py`, `schemas.py`, `views.py`, `jobs.py` |
 | `export.py` | Revisões humanas para JSONL | `export.py` |
+| `integrations/` | Extra opcional: avaliador do RegressionGuard (só importado pelos testes e pelo uso explícito) | `regressionguard.py` |
 | `dataset/` | Gerador determinista e validador do dataset sintético | `generator.py`, `validate.py` |
 | `experiments/` | Cinco estratégias, métricas, análise de casos desfavoráveis, relatório | `strategies.py`, `metrics.py`, `analysis.py`, `report.py`, `run.py` |
 
