@@ -94,3 +94,10 @@ Revisão feita sobre o código actual, sem auditoria externa. Ver a secção fin
 ### Nota sobre Docker
 
 `Dockerfile` e `docker-compose.yml` não foram testados localmente. A imagem corre como utilizador não-root e o compose exige os tokens por variável.
+
+## Revisão independente do supervisor (2026-11-21/23)
+
+- **Achado:** a identidade do revisor vinha do cabeçalho `X-Actor`, declarado pelo próprio cliente, o que tornava a auditoria falsificável. **Corrigido** em `c1fefa9`: o actor e o papel vêm do token, o `X-Actor` é ignorado, e há testes para a tentativa de falsificação.
+- **Achado:** o texto interno das excepções chegava aos clientes. **Corrigido** em `c1fefa9`: a resposta tem uma mensagem genérica e um `request_id`, e o detalhe só aparece nos logs do servidor.
+- **Risco aceite para a demo:** os tokens demo estão no código, com override por variável de ambiente. Cada token corresponde a um único principal.
+- O adaptador RegressionGuard (`e08d098`) só usa a API pública da `v0.1.0`.
