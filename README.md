@@ -1,106 +1,131 @@
 # ArbitrationLab
 
-Arbitragem calibrada de extrações feitas por LLMs: cada valor tem de existir no texto original, a confiança vem de fiabilidade medida, e o sistema abstém-se ou pede revisão humana quando não tem certeza.
+**Calibrated arbitration of LLM extractions. Every value must exist in the source text, confidence
+comes from measured reliability, and the system abstains or asks a human when it isn't sure.**
 
-Domínio fictício e dados sintéticos: participações de sinistro automóvel da **Seguros Horizonte Azul**. Não há PII real.
+When several models extract fields from a document, majority voting looks safe but isn't: two
+models can be wrong in the same way. ArbitrationLab decides each field from three things:
 
-> Estado: a arbitragem, a API, a revisão humana, a exportação, o painel e a experiência em mock estão implementados e testados. **Não há resultados com modelos reais**: os números do projecto são de mock e estão marcados como tal. Ver `docs/case-study.md`.
+- **evidence:** an exact span with offsets in the original text,
+- **agreement** between candidates,
+- **historical reliability:** confidence calibrated on a held-out split.
 
-## O que faz
+Each field ends in one of `accept`, `verify`, `human_review` or `abstain`, with the reason logged.
+Human reviews are audited and can be exported as labels.
 
-- Pede a 2 ou 3 candidatos (mock nesta versão) a extracção de 7 campos com schema JSON.
-- Normaliza cada valor por tipo (datas com ambiguidade explícita, montantes em pt-PT ou por extenso, matrículas, moedas, booleanos).
-- Procura o valor no texto e devolve o span com offsets exactos.
-- Decide cada campo: `accept`, `verify`, `human_review` ou `abstain`, com motivo registado.
-- Revisão humana via API e painel de três colunas, com auditoria (quem, quando, valor anterior e novo).
-- Exporta revisões para JSONL com `source: human_review`.
-- Compara cinco estratégias num relatório accuracy-vs-custo.
+> Fictional domain: car-insurance claim reports for **Seguros Horizonte Azul**. Synthetic data, no
+> real personal data.
 
-## Requisitos
+## Highlights
 
-- Python 3.12
-- Node 22+ (só para o painel)
-- Sem Docker, sem GPU, sem base de dados externa (SQLite).
+- **Evidence with offsets.** A value is accepted only if it can be found in the text, and the span
+  is returned with exact character offsets.
+- **Type-aware normalisation:**
+  - ambiguous dates are flagged explicitly,
+  - Portuguese and spelled-out amounts are parsed,
+  - licence plates, currencies and booleans are normalised.
+- **Calibration done properly.** Confidence is fitted on a calibration split (48 cases) and
+  evaluated on a separate split (72 cases), with Expected Calibration Error (ECE).
+- **Audited human review.** A three-column review panel (candidates, highlighted evidence, verdict)
+  records who changed what, when, and the previous value. Reviews export to JSONL.
+- **Honest comparison.** Five strategies are compared on accuracy against cost, including the cases
+  where arbitration loses.
+- **Reusable evaluator.** It plugs into
+  [RegressionGuard](https://github.com/agataofrancisco/regressionguard) as an optional evaluator.
 
-## Instalar e validar
+## Results (mock models, simulated cost)
+
+From [`experiments/reports/mock-report.md`](experiments/reports/mock-report.md):
+
+| Strategy | Exact match | Macro F1 | Critical errors | Sent to review | Cost/case |
+|---|---|---|---|---|---|
+| Single cheap model | 75.0% | 0.972 | 2.0% | 0.0% | $0.0020 |
+| Single strong model | 83.3% | 0.986 | 0.0% | 0.0% | $0.0200 |
+| Majority vote | 75.0% | 0.972 | 2.0% | 0.0% | $0.0240 |
+| Evidence arbitration | 75.0% | 0.973 | 1.8% | 0.0% | $0.0240 |
+| Arbitration + human review | **87.5%** | 0.982 | 1.8% | 3.6% | $0.0990 |
+
+What the numbers actually say:
+
+1. **Without human review, arbitration doesn't beat the single strong model** on this dataset, and
+   it costs more. The README says so rather than claiming a win.
+2. Review raises exact match, but the gain assumes a perfect reviewer and depends on the cost per
+   field. At $1.00 per field, the average cost per case rises to $0.274.
+3. **Evidence proves presence, not correctness.** Nine wrong `claimed_amount` values were accepted
+   because a draft line in the text contained a real number.
+4. With only 72 evaluation cases there are no confidence intervals, and real models are
+   `TODO: measure`.
+
+The full analysis is in [`docs/case-study.md`](docs/case-study.md).
+
+## How it works
+
+```mermaid
+flowchart LR
+    D[Claim text] --> C1[Candidate model 1]
+    D --> C2[Candidate model 2]
+    D --> C3[Candidate model 3]
+    C1 --> N[Normalise by type]
+    C2 --> N
+    C3 --> N
+    N --> E[Find evidence span<br/>exact offsets]
+    E --> CAL[Calibrated confidence<br/>agreement + reliability]
+    CAL --> DEC{Decision per field}
+    DEC --> A[accept]
+    DEC --> V[verify]
+    DEC --> H[human_review] --> AUD[(Audit log)] --> EXP[JSONL export]
+    DEC --> X[abstain]
+```
+
+## Tech stack
+
+Python 3.12 · FastAPI · Pydantic v2 · SQLite · React + Vite · pytest · Ruff · Docker Compose ·
+GitHub Actions
+
+## Run it locally (no Docker, no GPU, no API keys)
 
 ```bash
-python -m venv .venv
-source .venv/bin/activate            # Windows: .venv\Scripts\activate
+python -m venv .venv && source .venv/bin/activate      # Windows: .venv\Scripts\activate
 pip install -e ".[dev]"
+python -m arbitrationlab.experiments.run --mode mock --out experiments/reports   # table, chart, JSON
+python -m arbitrationlab                                                        # API at http://127.0.0.1:8000
+cd frontend && npm ci && npm run dev                                            # review panel at http://localhost:5173
+```
+
+Local demo tokens: `demo-client-token` (client role) and `demo-reviewer-token` (reviewer role). Any
+other environment must set `ARBITRATIONLAB_CLIENT_TOKEN` and `ARBITRATIONLAB_REVIEWER_TOKEN`. The
+Docker Compose file refuses to start without them. `--mode real` is deliberately refused because it
+needs API keys and a manual run.
+
+Endpoints:
+
+- `POST /arbitrations` and `GET /arbitrations/{id}`
+- `GET /arbitrations/{id}/candidates`
+- `POST /arbitrations/{id}/human-review` (reviewer)
+- `GET /reviews/export` (reviewer)
+- `GET /metrics`, `GET /schemas/claim` and `GET /health`
+
+## Quality checks
+
+```bash
 ruff check . && ruff format --check .
-pytest
+pytest                                                   # 208 tests
+python -m arbitrationlab.dataset.generator --out datasets/claims   # deterministic dataset
 ```
 
-Gerar o dataset (determinista; o ficheiro versionado é o resultado):
+## Known limitations
 
-```bash
-python -m arbitrationlab.dataset.generator --out datasets/claims
-```
+- **Mock models:** candidates are deterministic mocks with injected errors, and human review is
+  simulated from the labels, which is optimistic.
+- **Shared reviewer identity:** the reviewer identity is the token's principal, not a per-person
+  account.
+- **Smoke-only integration:** the RegressionGuard adapter has only been run on an 8-case smoke
+  suite.
 
-Experiência em mock (sem custos; gera tabela, gráfico e JSON):
+## Documentation
 
-```bash
-python -m arbitrationlab.experiments.run --mode mock --out experiments/reports
-```
-
-`--mode real` está recusado de propósito: exige chaves de API e execução manual.
-
-## Correr a API
-
-```bash
-cp .env.example .env                  # não é versionado; ajustar os tokens
-python -m arbitrationlab              # http://127.0.0.1:8000
-```
-
-Tokens de demo (só para desenvolvimento local): `demo-client-token` (papel `client`) e `demo-reviewer-token` (papel `reviewer`). Em qualquer outro ambiente, definir `ARBITRATIONLAB_CLIENT_TOKEN` e `ARBITRATIONLAB_REVIEWER_TOKEN`.
-
-Exemplo (PowerShell ou Git Bash):
-
-```bash
-curl -X POST http://127.0.0.1:8000/arbitrations \
-  -H "Authorization: Bearer demo-client-token" -H "Content-Type: application/json" \
-  -d @request.json
-curl http://127.0.0.1:8000/arbitrations/<id> -H "Authorization: Bearer demo-client-token"
-```
-
-Endpoints: `POST /arbitrations`, `GET /arbitrations/{id}`, `GET /arbitrations/{id}/candidates`, `POST /arbitrations/{id}/human-review` (papel `reviewer`; o revisor é o principal do token), `GET /reviews/export` (papel `reviewer`), `GET /metrics`, `GET /schemas/claim`, `GET /health`.
-
-## Painel de revisão
-
-```bash
-cd frontend
-npm ci
-npm run dev           # http://localhost:5173 (encaminha /arbitrations etc. para 127.0.0.1:8000)
-npm run build         # build de produção em frontend/dist
-```
-
-O token e o identificador do revisor ficam só em memória no separador.
-
-## Avaliador RegressionGuard (opcional)
-
-A arbitragem pode ser usada como avaliador do [RegressionGuard](https://github.com/agataofrancisco/regressionguard) (v0.1.0). É um extra opcional; a API não depende dele.
-
-```bash
-pip install -e ".[regressionguard]"
-python -c "from pathlib import Path; from arbitrationlab.integrations.regressionguard import run_claim_suite; [print(o) for o in run_claim_suite(Path('experiments/regressionguard/claims-smoke.jsonl'), root=Path('.'))]"
-pytest tests/test_regressionguard_adapter.py   # saltado se o extra não estiver instalado
-```
-
-O avaliador `arbitrationlab.claim_fields` passa se a arbitragem nunca aceita um valor diferente do gold. Campos em revisão não contam como erro.
-
-## Documentação
-
-- `docs/learn/` — percurso pedagógico (00 a 07), com as decisões e os números reais.
-- `docs/architecture.md` — módulos, fluxo de dados e revisão de segurança.
-- `docs/decisions.md` — decisões registadas e alternativas.
-- `docs/case-study.md` — resultados medidos e o que ainda não foi medido.
-- `openspec/changes/bootstrap-arbitrationlab/` — proposta, desenho, especificações e tarefas.
-
-## Limitações conhecidas
-
-- Os modelos são mocks deterministas com erros injectados; não medem LLMs reais.
-- A revisão humana é simulada a partir dos labels (optimista).
-- A identidade do revisor é a do token (principal fixo `revisor-demo`, configurável). Não há identidade por pessoa: quem tiver o token de revisor actua como esse principal.
-- Docker e `docker-compose.yml` não foram testados localmente.
-- O adaptador RegressionGuard é opcional (extra `regressionguard`, versão `v0.1.0`); só a suite de smoke foi corrida.
+- [`docs/architecture.md`](docs/architecture.md), [`docs/decisions.md`](docs/decisions.md),
+  [`docs/case-study.md`](docs/case-study.md)
+- [`docs/learn/`](docs/learn/) (Portuguese): why voting isn't truth, normalisation, evidence and
+  offsets, ECE calibration, abstention thresholds, cost against quality, and the RegressionGuard
+  evaluator, plus interview questions.
