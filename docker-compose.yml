@@ -1,4 +1,4 @@
-# NAO TESTADO LOCALMENTE (sem Docker neste ambiente). Tokens de demo: definir os reais no ambiente.
+# Verificado com docker compose em 2026-11-27. Tokens: definir no ambiente (sem valores predefinidos).
 services:
   api:
     build: .

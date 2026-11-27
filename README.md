@@ -93,9 +93,16 @@ cd frontend && npm ci && npm run dev                                            
 ```
 
 Local demo tokens: `demo-client-token` (client role) and `demo-reviewer-token` (reviewer role). Any
-other environment must set `ARBITRATIONLAB_CLIENT_TOKEN` and `ARBITRATIONLAB_REVIEWER_TOKEN`. The
-Docker Compose file refuses to start without them. `--mode real` is deliberately refused because it
-needs API keys and a manual run.
+other environment must set `ARBITRATIONLAB_CLIENT_TOKEN` and `ARBITRATIONLAB_REVIEWER_TOKEN`.
+`--mode real` is deliberately refused because it needs API keys and a manual run.
+
+**Docker** (verified on 2026-11-27: `/health` returns 200 and the container runs as a non-root
+user). The compose file refuses to start without the two tokens above. It publishes the API on
+`127.0.0.1:8000` only.
+
+```bash
+docker compose up --build
+```
 
 Endpoints:
 

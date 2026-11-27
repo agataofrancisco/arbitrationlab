@@ -35,7 +35,7 @@
 
 ## 5. Entrega
 
-- [x] 5.1 Dockerfile, `docker-compose.yml` (marcado como não testado localmente) e CI (Ruff, pytest, experiência em mock, build do frontend); verificar a validade do workflow
+- [x] 5.1 Dockerfile, `docker-compose.yml` (marcado como não testado localmente) e CI (Ruff, pytest, experiência em mock, build do frontend); verificar a validade do workflow (2026-11-27: `docker compose up --build` OK e `/health` 200; corrigido o bind do container de 127.0.0.1 para 0.0.0.0, mantendo a publicação só em 127.0.0.1 no host)
 - [x] 5.2 `README.md`, `docs/architecture.md`, `docs/decisions.md` e `docs/case-study.md`; verificar que os comandos correm
 - [x] 5.3 `docs/learn/07-perguntas-de-entrevista.md` (≥25); verificar a consistência com o código
 - [x] 5.4 Revisão de segurança independente (entrada não confiável, injecção, PII sintética, papéis de revisão); verificar que os achados estão resolvidos ou documentados
