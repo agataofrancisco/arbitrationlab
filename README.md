@@ -79,8 +79,7 @@ flowchart LR
 
 ## Tech stack
 
-Python 3.12 · FastAPI · Pydantic v2 · SQLite · React + Vite · pytest · Ruff · Docker Compose ·
-GitHub Actions
+Python 3.12 · FastAPI · Pydantic v2 · SQLite · React + Vite · pytest · Ruff · Docker Compose
 
 ## Run it locally (no Docker, no GPU, no API keys)
 
